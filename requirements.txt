@@ -1,0 +1,6 @@
+#Logging
+loguru
+
+# LLM pipeline
+langchain_community
+langchain-ollama

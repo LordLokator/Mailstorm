@@ -34,12 +34,12 @@ for email in emails:
     filename = email['filename']
     num = email['num']
 
+    print(f"Email n.o {num} ({filename}):")
+
     messages = [
         system_prompt,
         conversation,
     ]
-
-    print(f"Email n.o {num}:")
 
     print(model.invoke(messages))
 

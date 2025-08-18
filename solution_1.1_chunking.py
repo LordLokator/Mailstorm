@@ -41,6 +41,8 @@ for email in emails:
     filename = email['filename']
     num = email['num']
 
+    print(f"Email n.o {num} ({filename}):")
+
     # Split thread into chunks
     chunks = splitter.split_text(conversation)
 
@@ -52,7 +54,6 @@ for email in emails:
             blockers.append(out)
 
     # Aggregate to one output per email
-    print(f"Email n.o {num} ({filename}):")
     if blockers:
         print("- Blocker found: Yes")
         # Combine justifications into a single line

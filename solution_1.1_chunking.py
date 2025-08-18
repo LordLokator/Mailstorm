@@ -10,7 +10,7 @@ from langchain_ollama.llms import OllamaLLM
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1200,
+    chunk_size=800,
     chunk_overlap=100,
 )
 
@@ -66,4 +66,4 @@ for email in emails:
     print("##" * 30)
     print()
 
-    break
+    # break

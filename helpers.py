@@ -49,8 +49,9 @@ def parse(txt_files: dict[str, str]) -> tuple[dict, list[dict]]:
         if match:
 
             emails.append({
-                "filename": match.group(0),
-                "conversation": content
+                'filename': match.group(0),
+                'num': match.group(1),
+                'conversation': content
             })
 
         elif filename == "Colleagues.txt":

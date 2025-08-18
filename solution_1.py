@@ -5,10 +5,21 @@
 
 from langchain_ollama.llms import OllamaLLM
 
-from config import model_name, ollama_url, system_prompt
+from config import model_name, ollama_url
 
 from helpers import get_sanitized_data
 emails, colleagues = get_sanitized_data("data/content.zip")
+
+system_prompt = "You are a senior project manager specializing in risk detection in project communications. \
+                Your only task: detect potential blockers in the conversation. \
+                Disregard anything non-work related.\
+                A blocker is anything that delays progress, causes confusion, or requires escalation.  \
+                Examples: waiting on missing requirements, unresolved dependencies, unclear ownership,  \
+                resource constraints, lack of approvals, misaligned deadlines etc. \
+                Output format (always): \
+                - Blocker found: [Yes/No] \
+                - Description (if yes): [short text] \
+                Do NOT generate more messages, your role is only to evaluate the conversation!"
 
 model = OllamaLLM(
     # specified in config

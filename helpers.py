@@ -36,25 +36,30 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
     return files
 
 
-def parse(txt_files: dict[str, str]) -> tuple[str, list[str]]:
+def parse(txt_files: dict[str, str]) -> tuple[dict, list[dict]]:
     """Extract colleagues and emails from {filename: content} dict."""
     # Pass extracted txt files for testability (allows for DI style unittesting later).
 
     emails = []
-    colleagues = ""
+    _colleagues = ""
 
     for filename, content in txt_files.items():
         match = re.fullmatch(r"email(\d+)\.txt", filename, re.IGNORECASE)
 
         if match:
-            emails.append(content)
+
+            emails.append({
+                "filename": match.group(0),
+                "conversation": content
+            })
 
         elif filename == "Colleagues.txt":
-            colleagues = content
+            _colleagues = content
 
         else:
             logger.warning(f"Ignored unexpected file: {filename}")
 
+    colleagues = load_colleagues(_colleagues)
     return colleagues, emails
 
 
@@ -82,31 +87,32 @@ def load_colleagues(data: str):
     return colleagues
 
 
-def remove_mail_addresses(emails: list[str]) -> None:
+def remove_mail_addresses(emails: list) -> None:
     pattern = re.compile(r"\([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\)")
     # used regexr to check this regex selector.
     # It matches for mails with arbitrarily long TLDs.
 
     for i in range(len(emails)):
         # Modify in-place
-        emails[i] = pattern.sub("", emails[i]).strip()
+        emails[i]['conversation'] = pattern.sub("", emails[i]['conversation']).strip()
 
 
-def add_role_to_name(emails: list[str], colleagues: dict) -> None:
+def add_role_to_name(emails: list[dict[str, str]], colleagues: dict) -> None:
     for i, email in enumerate(emails):
         for name, info in colleagues.items():
             # Replace full name with role
             designation = f"{name} ({info["role"]})"
-            email = email.replace(name, designation)
+            email['conversation'] = email['conversation'].replace(name, designation)
         emails[i] = email
 
 
-if __name__ == '__main__':
+def get_sanitized_data(path: str) -> tuple[list[dict[str, str]], dict[str, dict]]:
+    """Accesssanitized data through this function. Expose only this function."""
 
-    path = "data/content.zip"
     txt_files = get_files_from_zip(path)
     colleagues, emails = parse(txt_files)
 
-    out = load_colleagues(colleagues)
+    remove_mail_addresses(emails)
+    add_role_to_name(emails, colleagues)
 
-    print(out.keys())
+    return emails, colleagues

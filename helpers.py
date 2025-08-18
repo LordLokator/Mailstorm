@@ -21,7 +21,7 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
                 try:
                     with zf.open(name) as f:
                         files[name] = f.read().decode('utf-8', errors='replace')
-                        logger.debug(f"Loaded {name}")
+                        logger.trace(f"Loaded {name}")
                 except Exception as e:
                     logger.warning(f"Failed to read {name}: {e}")
                     continue  # log the error but don't stop processing.
@@ -58,11 +58,36 @@ def parse(txt_files: dict[str, str]) -> tuple[str, dict[int, str]]:
     return colleagues, emails
 
 
+def load_colleagues(data: str):
+    colleagues = {}
+    pattern = re.compile(r"^(.*?)\s*:\s*(.*?)\s*\((.*?)\)$")
+    # regex breakdown:
+    #   ^               -> Start of Line
+    #   (.*?)\s*:\s*    -> capture text before a ':' character, disregard whitespace
+    #   (.*?)\s*\(      -> capture text until a '(' character
+    #   (.*?)\)         -> capture until a ')'
+    #   $               -> End of Line
+    # example inputs:
+    # "Project Manager (PM): Péter Kovács (kovacs.peter@...)"
+    # "Account Manager (AM): Zoltán Kiss (zoltan.kiss@kisjozsitech.hu)""
+
+    for line in data.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        match = pattern.match(line)
+        if match:
+            role, name, email = match.groups()
+            colleagues[name] = {"role": role, "email": email}
+    return colleagues
+
+
 if __name__ == '__main__':
 
     path = "data/content.zip"
     txt_files = get_files_from_zip(path)
     colleagues, emails = parse(txt_files)
 
-    for key, item in emails.items():
-        print(f"{key}: {type(key)} | {type(item)}")
+    out = load_colleagues(colleagues)
+
+    print(out.keys())

@@ -3,38 +3,23 @@
 # Some prompt engineering and setting the temperature to 0
 # were necessary to get consistently good outputs.
 
-from langchain_ollama.llms import OllamaLLM
-from langchain.prompts import PromptTemplate
-
-from config import model_name, ollama_url
-
 from helpers import get_sanitized_data
+from config import model_name, ollama_url
+from langchain_ollama.llms import OllamaLLM
+
+
 emails, colleagues = get_sanitized_data("data/content.zip")
 
 system_prompt = "You are a senior project manager specializing in risk detection in project communications. \
                 Your only task: detect potential blockers in the conversation. \
-                Disregard anything non-work related!\
-                A blocker is any issue that delays progress in a meaningful way.  \
+                Disregard anything non-work related.\
+                A blocker is anything that delays progress, causes confusion, or requires escalation.  \
                 Examples: waiting on missing requirements, unresolved dependencies, unclear ownership,  \
                 resource constraints, lack of approvals, misaligned deadlines etc. \
                 Do NOT generate more messages, your role is only to evaluate the conversation! \
                 Output format (always): \
-                Blocker found: [Yes/No] - [short explanation]"
-
-template = PromptTemplate(
-    input_variables=["system", "conversation"],
-    template="""[SYSTEM]
-{system}
-
-[CONVERSATION]
-{conversation}
-
-[OUTPUT]
-Respond with exactly ONE line in this format:
-Blocker found: [Yes/No] - [short explanation]
-"""
-)
-
+                - Blocker found: [Yes/No] \
+                - Justification: [short text]"
 
 model = OllamaLLM(
     # specified in config
@@ -51,15 +36,26 @@ for email in emails:
 
     print(f"Email n.o {num} ({filename}):")
 
-    messages = [
-        system_prompt,
-        conversation,
-    ]
+    # Split thread into chunks
+    chunks = conversation.split('\n\n')
 
-    prompt = template.format(system=system_prompt, conversation=conversation)
-    print(model.invoke(prompt))
+    # Collect results across chunks
+    blockers = []
+    for chunk in chunks:
+        out = model.invoke([system_prompt, chunk])
+        # print(f"\t>> {out}")
+        if "Yes" in out:   # crude but works if format is enforced
+            blockers.append(out)
 
-    # Prototype -> misusing loguru for formatting is totally allowed
+    # Aggregate to one output per email
+    if blockers:
+        print("\t>> Blocker found: Yes")
+
+        reasons = "; ".join(b.split("Justification:", 1)[-1].strip() for b in blockers)
+        print(f"\t>> Justification: {reasons}")
+    else:
+        print("\t>> Blocker found: No")
+
     print()
-    print(f"##" * 30)
+    print("##" * 30)
     print()

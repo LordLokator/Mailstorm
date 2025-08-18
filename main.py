@@ -1,12 +1,10 @@
-from config import model_name, template, ollama_url
-
-# SETUP
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama.llms import OllamaLLM
 
-from config import model_name, template, system_prompt
+from config import model_name, template, ollama_url, system_prompt
 
-# SETUP
+from helpers import get_sanitized_data
+emails, colleagues = get_sanitized_data("data/content.zip")
 
 chat_model = OllamaLLM(
     model=model_name,

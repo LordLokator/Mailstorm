@@ -20,7 +20,8 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
                     continue
                 try:
                     with zf.open(name) as f:
-                        files[name] = f.read().decode('utf-8', errors='replace')
+                        line = f.read().decode('utf-8', errors='replace')
+                        files[name] = line.replace("\r", "")
                         logger.trace(f"Loaded {name}")
                 except Exception as e:
                     logger.warning(f"Failed to read {name}: {e}")

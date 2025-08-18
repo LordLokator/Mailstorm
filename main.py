@@ -1,22 +1,33 @@
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama.llms import OllamaLLM
 
-from config import model_name, template, ollama_url, system_prompt
+from config import model_name, ollama_url, system_prompt
 
 from helpers import get_sanitized_data
 emails, colleagues = get_sanitized_data("data/content.zip")
 
-chat_model = OllamaLLM(
+model = OllamaLLM(
+    # specified in config
     model=model_name,
-    base_url=ollama_url
+    base_url=ollama_url,
+
+    temperature=0  # reproducibility
 )
 
-Human_Question = input("What do you want to ask Ollama? ")
+for email in emails:
+    conversation = email['conversation']
+    filename = email['filename']
+    num = email['num']
 
+    messages = [
+        system_prompt,
+        conversation,
+    ]
 
-messages = [
-    system_prompt,
-    Human_Question,
-]
+    print(f"Email n.o {num}:")
 
-print(chat_model.invoke(messages))
+    print(model.invoke(messages))
+
+    # Prototype -> misusing loguru for formatting is totally allowed
+    print()
+    print(f"##" * 30)
+    print()

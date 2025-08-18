@@ -82,6 +82,25 @@ def load_colleagues(data: str):
     return colleagues
 
 
+def remove_mail_addresses(emails: list[str]) -> None:
+    pattern = re.compile(r"\([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\)")
+    # used regexr to check this regex selector.
+    # It matches for mails with arbitrarily long TLDs.
+
+    for i in range(len(emails)):
+        # Modify in-place
+        emails[i] = pattern.sub("", emails[i]).strip()
+
+
+def add_role_to_name(emails: list[str], colleagues: dict) -> None:
+    for i, email in enumerate(emails):
+        for name, info in colleagues.items():
+            # Replace full name with role
+            designation = f"{name} ({info["role"]})"
+            email = email.replace(name, designation)
+        emails[i] = email
+
+
 if __name__ == '__main__':
 
     path = "data/content.zip"

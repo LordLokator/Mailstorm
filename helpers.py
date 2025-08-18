@@ -36,18 +36,18 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
     return files
 
 
-def parse(txt_files: dict[str, str]) -> tuple[str, dict[int, str]]:
+def parse(txt_files: dict[str, str]) -> tuple[str, list[str]]:
     """Extract colleagues and emails from {filename: content} dict."""
     # Pass extracted txt files for testability (allows for DI style unittesting later).
 
-    emails = {}
+    emails = []
     colleagues = ""
 
     for filename, content in txt_files.items():
         match = re.fullmatch(r"email(\d+)\.txt", filename, re.IGNORECASE)
 
         if match:
-            emails[int(match.group(1))] = content
+            emails.append(content)
 
         elif filename == "Colleagues.txt":
             colleagues = content

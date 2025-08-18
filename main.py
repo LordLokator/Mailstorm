@@ -4,7 +4,7 @@ from config import model_name, template, ollama_url
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama.llms import OllamaLLM
 
-from config import model_name, template
+from config import model_name, template, system_prompt
 
 # SETUP
 
@@ -15,13 +15,9 @@ chat_model = OllamaLLM(
 
 Human_Question = input("What do you want to ask Ollama? ")
 
-SystemMessage = "You are a assistant knowledgable in space. \
-                Only answer questions related to space. \
-                If the question is not related to space \
-                then reply with 'I don't know'."
 
 messages = [
-    SystemMessage,
+    system_prompt,
     Human_Question,
 ]
 

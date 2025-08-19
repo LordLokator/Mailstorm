@@ -118,3 +118,25 @@ def get_sanitized_data(path: str) -> tuple[list[dict[str, str]], dict[str, dict]
     add_role_to_name(emails, colleagues)
 
     return emails, colleagues
+
+if __name__ == '__main__':
+
+    path = "data/content.zip"
+    emails, colleagues = get_sanitized_data(path)
+
+    print('##' * 30)
+    print(colleagues)
+    print('--' * 30)
+
+    print(emails[0].keys())
+
+    # EMAIL_BLOCK_RE = re.compile(
+    #     r"From:\s*(?P<from>.+?)\s*\((?P<from_email>.+?)\)\s*"
+    #     r"To:\s*(?P<to>.+?)\s*"
+    #     r"Date:\s*(?P<date>.+?)\s*"
+    #     r"Subject:\s*(?P<subject>.+?)\s*"
+    #     r"(?P<body>.+?)(?=From:|$)",
+    #     re.DOTALL
+    # )
+
+    # print([k for k in EMAIL_BLOCK_RE.finditer(emails[2])])

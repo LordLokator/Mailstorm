@@ -8,7 +8,7 @@ from config import model, output_format, system_prompt
 
 from langchain.prompts import PromptTemplate
 
-from helpers import get_sanitized_data
+from helpers import get_sanitized_data, invoke_async
 emails, colleagues = get_sanitized_data("data/content.zip")
 
 template = PromptTemplate(
@@ -44,6 +44,7 @@ unanswered or unaddressed for a significant period.
 communications that lack a clear resolution path.
 """
 
+model_outputs = []
 for i, email in enumerate(emails):
     conversation = email['conversation']
     filename = email['filename']
@@ -67,11 +68,31 @@ for i, email in enumerate(emails):
         Answer without any introductory or conclusion text.
         """
     )
-    print(model.invoke(prompt))
+
+    model_output = model.invoke(prompt)
+    model_outputs.append(model_output)
+    print(model_output)
 
     # Prototype -> misusing loguru for formatting is totally allowed
 
     print('\n', f"##" * 30, '\n')
 
-    if i > 3:
+    if i > 2:
         break
+
+final_prompt = template.format(
+    system=system_prompt,
+    conversation="\n".join([e['conversation'] for e in emails]),  # combine all emails if needed
+    output_format="""
+    Given the following input, list every instance of the following two issue types:
+    1. Unresolved High-Priority Action Items (UHPAI): Questions or tasks that have gone \
+unanswered or unaddressed for a significant period.
+    2. Emerging Risks/Blockers: Potential problems or obstacles identified in \
+communications that lack a clear resolution path.
+"""
+)
+
+print(final_prompt)
+summary = model.invoke(final_prompt)
+
+print(summary)

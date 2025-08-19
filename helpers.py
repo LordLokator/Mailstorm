@@ -140,3 +140,7 @@ if __name__ == '__main__':
     # )
 
     # print([k for k in EMAIL_BLOCK_RE.finditer(emails[2])])
+
+async def invoke_async(llm, prompt):
+    result = await llm.ainvoke(prompt)
+    print(result)

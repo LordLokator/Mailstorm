@@ -5,9 +5,9 @@
 
 from textwrap import dedent
 from helpers import get_sanitized_data
-from config import model_name, ollama_url
-from langchain_ollama.llms import OllamaLLM
+from config import model, system_prompt
 
+from langchain.prompts import PromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 splitter = RecursiveCharacterTextSplitter(
@@ -18,23 +18,21 @@ splitter = RecursiveCharacterTextSplitter(
 
 emails, colleagues = get_sanitized_data("data/content.zip")
 
-system_prompt = "You are a senior project manager specializing in risk detection in project communications. \
-                Your only task: detect potential blockers in the conversation. \
-                Disregard anything non-work related.\
-                A blocker is anything that delays progress, causes confusion, or requires escalation.  \
-                Examples: waiting on missing requirements, unresolved dependencies, unclear ownership,  \
-                resource constraints, lack of approvals, misaligned deadlines etc. \
-                Do NOT generate more messages, your role is only to evaluate the conversation! \
-                Output format (always): \
-                - Blocker found: [Yes/No] \
-                - Justification: [short text]"
+template = PromptTemplate(
+    input_variables=["system", "conversation"],
+    template=dedent(
+        """
+        [SYSTEM]
+        {system}
 
-model = OllamaLLM(
-    # specified in config
-    model=model_name,
-    base_url=ollama_url,
+        [CONVERSATION]
+        {conversation}
 
-    temperature=0  # reproducibility
+        [OUTPUT]
+        Respond with exactly ONE line in this format:
+        Blocker found: [Yes/No] - [short explanation]
+        """
+    )
 )
 
 for email in emails:
@@ -50,9 +48,13 @@ for email in emails:
     # Collect results across chunks
     blockers = []
     for chunk in chunks:
-        out = model.invoke([system_prompt, chunk])
-        if "Yes" in out:   # crude but works if format is enforced
-            blockers.append(out)
+
+        prompt = template.format(system=system_prompt, conversation=conversation)
+        model_output = model.invoke(prompt)
+        print(model_output)
+
+        if "Yes" in model_output:   # crude but works if format is enforced
+            blockers.append(model_output)
 
     # Aggregate to one output per email
     if blockers:

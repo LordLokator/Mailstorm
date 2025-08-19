@@ -1,7 +1,7 @@
-# Solution 1 is the most naive approach:
-# simply give the sanitized emails as inputs.
-# Some prompt engineering and setting the temperature to 0
-# were necessary to get consistently good outputs.
+# Solution 1.1 uses 'manual' chunking
+# to prevent dilution caused by long contexts.
+# It uses the str.split method,
+# splitting along two new lines (demarcating emails).
 
 from helpers import get_sanitized_data
 from config import model_name, ollama_url

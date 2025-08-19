@@ -2,6 +2,8 @@
 # simply give the sanitized emails as inputs.
 # Some prompt engineering and setting the temperature to 0
 # were necessary to get consistently good outputs.
+# Using langchain's PromptTemplate class made
+# the model follow output rules much more closely.
 
 from langchain_ollama.llms import OllamaLLM
 

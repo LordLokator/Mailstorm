@@ -1,8 +1,9 @@
-# Solution 1 is the most naive approach:
-# simply give the sanitized emails as inputs.
-# Some prompt engineering and setting the temperature to 0
-# were necessary to get consistently good outputs.
+# Solution 1.1 uses chunking
+# to prevent dilution caused by long contexts.
+# It uses LangChain's inbuilt splitter that
+# chunks text into N character long pieces with some overlap.
 
+from textwrap import dedent
 from helpers import get_sanitized_data
 from config import model_name, ollama_url
 from langchain_ollama.llms import OllamaLLM

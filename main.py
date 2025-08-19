@@ -4,12 +4,9 @@
 # were necessary to get consistently good outputs.
 
 from textwrap import dedent
-from helpers import get_sanitized_data
-from config import model, system_prompt
+from config import model, output_format, system_prompt
 
 from langchain.prompts import PromptTemplate
-
-from config import model_name, ollama_url
 
 from helpers import get_sanitized_data
 emails, colleagues = get_sanitized_data("data/content.zip")
@@ -25,14 +22,29 @@ template = PromptTemplate(
         {conversation}
 
         [OUTPUT]
-        Respond with exactly ONE line in this format:
-        Blocker found: [Yes/No] - [short explanation]
+        {output_format}
         """
     )
 )
 
+system_prompt = """
+You are a summarization agent helping a Project Manager by summarizing email conversation chains.
+Summarize the email convesation below!
+Follow these principles:
+Relevant — the summary retains important points and details from the source text;
+Concise — the summary is information-dense, does not repeat the same point multiple times, and is not unnecessarily verbose;
+Coherent — the summary is well-structured and easy to follow, not just a jumble of condensed facts;
+Faithful — the summary does not hallucinate information that is not supported by the source text.
 
-for email in emails:
+Focus on capturing / identifying issues like below:
+
+1. Unresolved High-Priority Action Items (UHPAI): Questions or tasks that have gone \
+unanswered or unaddressed for a significant period.
+2. Emerging Risks/Blockers: Potential problems or obstacles identified in \
+communications that lack a clear resolution path.
+"""
+
+for i, email in enumerate(emails):
     conversation = email['conversation']
     filename = email['filename']
     num = email['num']
@@ -44,10 +56,22 @@ for email in emails:
         conversation,
     ]
 
-    prompt = template.format(system=system_prompt, conversation=conversation)
+    prompt = template.format(
+        system=system_prompt,
+        conversation=conversation,
+        output_format="""
+        Be brief, do not write greeting or intros,
+        reply only with the relevant summarization!
+        Disregard and do not mention anything not work related,
+        e.g parties or holliday plans!
+        Answer without any introductory or conclusion text.
+        """
+    )
     print(model.invoke(prompt))
 
     # Prototype -> misusing loguru for formatting is totally allowed
-    print()
-    print(f"##" * 30)
-    print()
+
+    print('\n', f"##" * 30, '\n')
+
+    if i > 3:
+        break

@@ -3,11 +3,10 @@
 # It uses LangChain's inbuilt splitter that
 # chunks text into N character long pieces with some overlap.
 
-from textwrap import dedent
 from helpers import get_sanitized_data
-from config import model, system_prompt
+from prompts import prompts
+from config import model, template
 
-from langchain.prompts import PromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 splitter = RecursiveCharacterTextSplitter(
@@ -17,23 +16,6 @@ splitter = RecursiveCharacterTextSplitter(
 
 
 emails, colleagues = get_sanitized_data("data/content.zip")
-
-template = PromptTemplate(
-    input_variables=["system", "conversation"],
-    template=dedent(
-        """
-        [SYSTEM]
-        {system}
-
-        [CONVERSATION]
-        {conversation}
-
-        [OUTPUT]
-        Respond with exactly ONE line in this format:
-        Blocker found: [Yes/No] - [short explanation]
-        """
-    )
-)
 
 for email in emails:
     conversation = email['conversation']
@@ -49,7 +31,12 @@ for email in emails:
     blockers = []
     for chunk in chunks:
 
-        prompt = template.format(system=system_prompt, conversation=conversation)
+
+        prompt = template.format(
+            system=prompts['unified']['system_prompt'],
+            conversation=conversation,
+            output_format=prompts['unified']['output_format']
+        )
         model_output = model.invoke(prompt)
         print(model_output)
 
@@ -65,8 +52,6 @@ for email in emails:
     else:
         print("- Blocker found: No")
 
-    print()
-    print("##" * 30)
-    print()
+    print('\n', f"##" * 30, '\n')
 
     # break

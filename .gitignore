@@ -12,3 +12,6 @@ ipython_config.py
 
 # Environments
 .venv
+
+# Custom
+*.txt

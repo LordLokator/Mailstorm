@@ -20,8 +20,9 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
                     continue
                 try:
                     with zf.open(name) as f:
-                        files[name] = f.read().decode('utf-8', errors='replace')
-                        logger.debug(f"Loaded {name}")
+                        line = f.read().decode('utf-8', errors='replace')
+                        files[name] = line.replace("\r", "")
+                        logger.trace(f"Loaded {name}")
                 except Exception as e:
                     logger.warning(f"Failed to read {name}: {e}")
                     continue  # log the error but don't stop processing.
@@ -36,33 +37,110 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
     return files
 
 
-def parse(txt_files: dict[str, str]) -> tuple[str, dict[int, str]]:
+def parse(txt_files: dict[str, str]) -> tuple[dict, list[dict]]:
     """Extract colleagues and emails from {filename: content} dict."""
     # Pass extracted txt files for testability (allows for DI style unittesting later).
 
-    emails = {}
-    colleagues = ""
+    emails = []
+    _colleagues = ""
 
     for filename, content in txt_files.items():
         match = re.fullmatch(r"email(\d+)\.txt", filename, re.IGNORECASE)
 
         if match:
-            emails[int(match.group(1))] = content
+
+            emails.append({
+                'filename': match.group(0),
+                'num': match.group(1),
+                'conversation': content
+            })
 
         elif filename == "Colleagues.txt":
-            colleagues = content
+            _colleagues = content
 
         else:
             logger.warning(f"Ignored unexpected file: {filename}")
 
+    colleagues = load_colleagues(_colleagues)
     return colleagues, emails
 
+
+def load_colleagues(data: str):
+    colleagues = {}
+    pattern = re.compile(r"^(.*?)\s*:\s*(.*?)\s*\((.*?)\)$")
+    # regex breakdown:
+    #   ^               -> Start of Line
+    #   (.*?)\s*:\s*    -> capture text before a ':' character, disregard whitespace
+    #   (.*?)\s*\(      -> capture text until a '(' character
+    #   (.*?)\)         -> capture until a ')'
+    #   $               -> End of Line
+    # example inputs:
+    # "Project Manager (PM): Péter Kovács (kovacs.peter@...)"
+    # "Account Manager (AM): Zoltán Kiss (zoltan.kiss@kisjozsitech.hu)""
+
+    for line in data.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        match = pattern.match(line)
+        if match:
+            role, name, email = match.groups()
+            colleagues[name] = {"role": role, "email": email}
+    return colleagues
+
+
+def remove_mail_addresses(emails: list) -> None:
+    pattern = re.compile(r"\([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+\)")
+    # used regexr to check this regex selector.
+    # It matches for mails with arbitrarily long TLDs.
+
+    for i in range(len(emails)):
+        # Modify in-place
+        emails[i]['conversation'] = pattern.sub("", emails[i]['conversation']).strip()
+
+
+def add_role_to_name(emails: list[dict[str, str]], colleagues: dict) -> None:
+    for i, email in enumerate(emails):
+        for name, info in colleagues.items():
+            # Replace full name with role
+            designation = f"{name} ({info["role"]})"
+            email['conversation'] = email['conversation'].replace(name, designation)
+        emails[i] = email
+
+
+def get_sanitized_data(path: str) -> tuple[list[dict[str, str]], dict[str, dict]]:
+    """Accesssanitized data through this function. Expose only this function."""
+
+    txt_files = get_files_from_zip(path)
+    colleagues, emails = parse(txt_files)
+
+    remove_mail_addresses(emails)
+    add_role_to_name(emails, colleagues)
+
+    return emails, colleagues
 
 if __name__ == '__main__':
 
     path = "data/content.zip"
-    txt_files = get_files_from_zip(path)
-    colleagues, emails = parse(txt_files)
+    emails, colleagues = get_sanitized_data(path)
 
-    for key, item in emails.items():
-        print(f"{key}: {type(key)} | {type(item)}")
+    print('##' * 30)
+    print(colleagues)
+    print('--' * 30)
+
+    print(emails[0].keys())
+
+    # EMAIL_BLOCK_RE = re.compile(
+    #     r"From:\s*(?P<from>.+?)\s*\((?P<from_email>.+?)\)\s*"
+    #     r"To:\s*(?P<to>.+?)\s*"
+    #     r"Date:\s*(?P<date>.+?)\s*"
+    #     r"Subject:\s*(?P<subject>.+?)\s*"
+    #     r"(?P<body>.+?)(?=From:|$)",
+    #     re.DOTALL
+    # )
+
+    # print([k for k in EMAIL_BLOCK_RE.finditer(emails[2])])
+
+async def invoke_async(llm, prompt):
+    result = await llm.ainvoke(prompt)
+    print(result)

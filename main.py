@@ -8,7 +8,7 @@ from config import model, output_format, system_prompt
 
 from langchain.prompts import PromptTemplate
 
-from helpers import get_sanitized_data, invoke_async
+from helpers import get_sanitized_data
 emails, colleagues = get_sanitized_data("data/content.zip")
 
 template = PromptTemplate(

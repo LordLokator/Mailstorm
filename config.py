@@ -39,6 +39,9 @@ model = OllamaLLM(
     temperature=0  # reproducibility
 )
 
+async def invoke_async(llm, prompt):
+    result = await llm.ainvoke(prompt)
+    print(result)
 
 template = PromptTemplate(
     input_variables=["system", "conversation"],

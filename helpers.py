@@ -1,7 +1,7 @@
 from pathlib import Path
 from zipfile import ZipFile, BadZipFile
 from loguru import logger
-import pprint
+import json
 import re
 
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     emails, colleagues = get_sanitized_data(path)
 
     print('##' * 30)
-    pprint.pprint(colleagues)
+    print (json.dumps(colleagues, indent=4, ensure_ascii=False))
     print('--' * 30)
 
     print(emails[0].keys())

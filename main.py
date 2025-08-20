@@ -82,7 +82,7 @@ for i, email in enumerate(emails):
 
 final_prompt = template.format(
     system=system_prompt,
-    conversation="\n".join([e['conversation'] for e in emails]),  # combine all emails if needed
+    conversation="\n".join(model_outputs),  # combine all outputs
     output_format="""
     Given the following input, list every instance of the following two issue types:
     1. Unresolved High-Priority Action Items (UHPAI): Questions or tasks that have gone \

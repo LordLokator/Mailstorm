@@ -1,4 +1,5 @@
 from config import model
+from data_transformers import get_sanitized_data
 from prompts import (
     SINGLE_MAIL_SUMMARY_SYS_PROMPT,
     SINGLE_MAIL_OUTPUT_FORMAT,
@@ -9,7 +10,6 @@ from prompts import (
     template
 )
 
-from data_transformers import get_sanitized_data
 
 if __name__ == "__main__":
 

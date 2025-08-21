@@ -21,6 +21,7 @@ chunking_strategy = Mode.FULL_CONVERSATION
 
 # For splitting the convo along emails (split along '\n\n' substring):
 # chunking_strategy = Mode.MANUAL_SPLIT
+
 match chunking_strategy:
     case Mode.FULL_CONVERSATION:
         print("Processing full email conversation")

@@ -14,7 +14,9 @@ from prompts import (
 )
 
 
-def main(mode: Mode):
+def main(mode: Mode, path = None):
+    path = path or "data/content.zip"
+
     match mode:
         case Mode.FULL_CONVERSATION:
             logger.info("Processing full email conversation")
@@ -31,7 +33,7 @@ def main(mode: Mode):
         case Mode.MANUAL_SPLIT:
             logger.info("Using manual chunking")
 
-    emails, _ = get_sanitized_data("data/content.zip")
+    emails, _ = get_sanitized_data(path)
 
     model_outputs = []
     for i, email in enumerate(emails):
@@ -132,8 +134,17 @@ if __name__ == "__main__":
         help="Set the chunking strategy (default: none)."
     )
 
+    parser.add_argument(
+        "--path",
+        type=str,
+        default="./data/content.zip",
+        help="Path to the .zip file (default: ./data/content.zip)."
+    )
+
+
     args = parser.parse_args()
     logger.info(f"Selected chunking strategy: {args.chunking_strategy}")
+    logger.info(f"Path to zip: {args.path}")
 
     if args.chunking_strategy == 'manual':
         # For splitting the convo along emails (split along '\n\n' substring):
@@ -147,4 +158,4 @@ if __name__ == "__main__":
         # Pass whole email conversation as context:
         mode = Mode.FULL_CONVERSATION
 
-    main(mode)
+    main(mode, args.path)

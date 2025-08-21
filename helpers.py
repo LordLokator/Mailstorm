@@ -88,27 +88,21 @@ def load_colleagues(data: str):
             colleagues[name] = {"role": role, "email": email}
     return colleagues
 
+
 if __name__ == '__main__':
 
-    from data_transformers import get_sanitized_data
     import json
 
     path = "data/content.zip"
-    emails, colleagues = get_sanitized_data(path)
+    txt_files = get_files_from_zip(path)
+    colleagues, emails = parse(txt_files)
 
-    print('##' * 30)
-    print (json.dumps(colleagues, indent=4, ensure_ascii=False))
+    print("> Colleagues dump:\n")
+
+    print(json.dumps(colleagues, indent=4, ensure_ascii=False))
+
     print('--' * 30)
 
+    print(f"> First email (as a {type(emails[0]).__name__}):\n")
+
     print(emails[0])
-
-    # EMAIL_BLOCK_RE = re.compile(
-    #     r"From:\s*(?P<from>.+?)\s*\((?P<from_email>.+?)\)\s*"
-    #     r"To:\s*(?P<to>.+?)\s*"
-    #     r"Date:\s*(?P<date>.+?)\s*"
-    #     r"Subject:\s*(?P<subject>.+?)\s*"
-    #     r"(?P<body>.+?)(?=From:|$)",
-    #     re.DOTALL
-    # )
-
-    # print([k for k in EMAIL_BLOCK_RE.finditer(emails[2])])

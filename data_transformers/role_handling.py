@@ -1,4 +1,4 @@
-def add_roles_to_names(emails: list[dict[str, str]], colleagues: dict) -> None:
+def add_roles_to_names_inplace(emails: list[dict[str, str]], colleagues: dict) -> None:
     for i, email in enumerate(emails):
         for name, info in colleagues.items():
             # Replace full name with role

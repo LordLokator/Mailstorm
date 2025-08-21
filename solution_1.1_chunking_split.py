@@ -1,8 +1,3 @@
-# Solution 1.1 uses 'manual' chunking
-# to prevent dilution caused by long contexts.
-# It uses the str.split method,
-# splitting along two new lines (demarcating emails).
-
 from data_transformers import get_sanitized_data
 from config import model, system_prompt
 

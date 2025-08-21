@@ -1,8 +1,3 @@
-# Solution 1.1 uses chunking
-# to prevent dilution caused by long contexts.
-# It uses LangChain's inbuilt splitter that
-# chunks text into N character long pieces with some overlap.
-
 from data_transformers import get_sanitized_data
 from prompts import prompts
 from config import model, template

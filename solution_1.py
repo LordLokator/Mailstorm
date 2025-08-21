@@ -1,10 +1,3 @@
-# Solution 1 is the most naive approach:
-# simply give the sanitized emails as inputs.
-# Some prompt engineering and setting the temperature to 0
-# were necessary to get consistently good outputs.
-# Using langchain's PromptTemplate class made
-# the model follow output rules much more closely.
-
 from prompts import prompts
 from config import model, template
 from data_transformers import get_sanitized_data

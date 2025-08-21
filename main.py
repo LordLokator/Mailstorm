@@ -1,8 +1,3 @@
-# Solution 1 is the most naive approach:
-# simply give the sanitized emails as inputs.
-# Some prompt engineering and setting the temperature to 0
-# were necessary to get consistently good outputs.
-
 from textwrap import dedent
 from config import model, output_format, system_prompt
 

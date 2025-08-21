@@ -12,11 +12,6 @@ for email in emails:
 
     print(f"Email n.o {num} ({filename}):")
 
-    messages = [
-        prompts['system_prompt'],
-        conversation,
-    ]
-
     prompt = template.format(
         system=prompts['unified']['system_prompt'],
         conversation=conversation,

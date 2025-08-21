@@ -47,11 +47,6 @@ for i, email in enumerate(emails):
 
     print(f"Email n.o {num} ({filename}):")
 
-    messages = [
-        system_prompt,
-        conversation,
-    ]
-
     prompt = template.format(
         system=system_prompt,
         conversation=conversation,

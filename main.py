@@ -40,7 +40,7 @@ match chunking_strategy:
         logger.info("Using manual chunking")
 
 
-if __name__ == "__main__":
+def main():
 
     emails, colleagues = get_sanitized_data("data/content.zip")
 
@@ -127,3 +127,7 @@ if __name__ == "__main__":
     summary = model.invoke(final_prompt)
 
     logger.info(summary)
+
+
+if __name__ == "__main__":
+    main()

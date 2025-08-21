@@ -9,24 +9,28 @@ This repository contains the initial scaffold for a text-based LLM project, prep
 ```
 .
 ├── Blueprint.md
-│
 ├── config.py
-│
+├── control.py
 ├── data
-│   │ # input data
 │   └── content.zip
-│
+├── data_transformers
+│   ├── date_handling.py
+│   ├── email_handling.py
+│   ├── __init__.py
+│   ├── role_handling.py
+│   └── sanitize_pipeline.py
 ├── helpers.py
-│
+├── json_handler.py
+├── logs
 ├── main.py
-│
+├── outputs
+│   └── summary.json
+├── prompts.py
 ├── README.md
-│
-├── requirements.txt
-│
+├── resources.md
 ├── setup.sh
-│
 └── tests
+    └── test_helpers.py
 ```
 
 ---

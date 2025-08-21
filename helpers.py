@@ -30,7 +30,7 @@ def get_files_from_zip(path: str, suffix: str = '.txt') -> dict[str, str]:
     except BadZipFile:
         logger.exception(f"Bad ZIP file: {zip_path}.")
 
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error opening {zip_path}.")
         raise
 

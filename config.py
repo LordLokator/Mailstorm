@@ -1,4 +1,3 @@
-from textwrap import dedent
 from langchain_ollama.llms import OllamaLLM
 
 # Ollama params.

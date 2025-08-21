@@ -5,7 +5,7 @@ from helpers import get_files_from_zip, parse
 
 
 def get_sanitized_data(path: str) -> tuple[list[dict[str, str]], dict[str, dict]]:
-    """Accesssanitized data through this function. Expose only this function."""
+    """Access sanitized data through this function. Expose only this function."""
 
     txt_files = get_files_from_zip(path)
     colleagues, emails = parse(txt_files)

@@ -13,7 +13,7 @@ def remove_mail_addresses(emails: list) -> None:
 
 if __name__ == '__main__':
 
-    from helpers import get_sanitized_data
+    from data_transformers import get_sanitized_data
     path = "data/content.zip"
     emails, _ = get_sanitized_data(path)
 

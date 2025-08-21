@@ -26,8 +26,8 @@ def main(mode: Mode, path = None):
             from langchain_text_splitters import RecursiveCharacterTextSplitter
 
             splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1200,
-                chunk_overlap=100,
+                chunk_size=2500,
+                chunk_overlap=200,
             )
 
         case Mode.MANUAL_SPLIT:

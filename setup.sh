@@ -2,8 +2,8 @@
 set -e
 
 # Log file
-mkdir -p -m 700 artifacts/logs
-LOGFILE="./artifacts/logs/setup.log"
+mkdir -p -m 700 /logs
+LOGFILE="./logs/setup.log"
 
 # Create venv
 echo "Creating virtual environment '.venv'..."

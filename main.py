@@ -1,6 +1,7 @@
 from config import model
 from data_transformers import get_sanitized_data
 from control import Mode
+from json_handler import save_json_safe
 from loguru import logger
 from prompts import (
     SINGLE_MAIL_SUMMARY_SYS_PROMPT,
@@ -42,7 +43,7 @@ match chunking_strategy:
 
 def main():
 
-    emails, colleagues = get_sanitized_data("data/content.zip")
+    emails, _ = get_sanitized_data("data/content.zip")
 
     model_outputs = []
     for i, email in enumerate(emails):
@@ -99,6 +100,7 @@ def main():
 
                 chunk_inference_outputs = []
                 for chunk in chunks:
+                    # TODO: write more chunk-specific prompts!
                     out = model.invoke([SINGLE_MAIL_SUMMARY_SYS_PROMPT, chunk])
                     chunk_inference_outputs.append(out)
 
@@ -117,14 +119,16 @@ def main():
         # if i > 2:
         #     break
 
+    combined_reports = "\n".join(model_outputs) # bit naive
     final_prompt = template.format(
         system=MASTER_SUMMARIZATION_SYS_PROMPT,
-        conversation="\n".join(model_outputs),  # combine all outputs
+        conversation=combined_reports,  # combine all outputs
         output_format=MASTER_SUMMARIZATION_OUTPUT_FORMAT
     )
 
     logger.info(final_prompt)
     summary = model.invoke(final_prompt)
+    save_json_safe(summary)
 
     logger.info(summary)
 

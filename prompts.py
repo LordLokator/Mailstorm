@@ -59,9 +59,29 @@ MASTER_SUMMARIZATION_SYS_PROMPT = \
 
 MASTER_SUMMARIZATION_OUTPUT_FORMAT = \
     dedent("""
-    Given the following input, list every instance of the following two issue types:
-    1. Unresolved High-Priority Action Items (UHPAI): Questions or tasks that have gone unanswered or unaddressed for a significant period.
-    2. Emerging Risks/Blockers: Potential problems or obstacles identified in communications that lack a clear resolution path.
+    {
+    "unresolved_high_priority_action_items": [
+        {
+        "description": "<brief description of the task or question>",
+        "assignee": "<who is responsible>",
+        "time_elapsed": "<relative time since it was first raised>"
+        },
+        ...
+    ],
+    "emerging_risks_blockers": [
+        {
+        "description": "<brief description of the risk or blocker>",
+        "impact": "<high / medium / low>",
+        "suggested_action": "<optional suggestion>"
+        },
+        ...
+    ]
+    }
+
+    - Use only information present in the conversation.
+    - Do not include greetings, intros, or unrelated details.
+    - Ensure valid JSON syntax (use double quotes).
+    - List each item as a separate entry in the appropriate array.
 """)
 
 # region legacy

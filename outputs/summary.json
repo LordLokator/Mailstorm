@@ -1,0 +1,51 @@
+{
+  "unresolved_high_priority_action_items": [
+    {
+      "description": "Gábor's question about callback URL handling in Barion's API documentation",
+      "assignee": "Barion's support team",
+      "time_elapsed": "14 days"
+    },
+    {
+      "description": "Status of integration task after urgent server maintenance",
+      "assignee": "Integration team",
+      "time_elapsed": "unclear"
+    },
+    {
+      "description": "Anna's request for a 'NEW' badge on product images",
+      "assignee": "Bence and Zsófia",
+      "time_elapsed": "2 days"
+    },
+    {
+      "description": "Modifying newsletter subscription checkbox to be unchecked by default",
+      "assignee": "Zsófia Varga",
+      "time_elapsed": "awaiting client confirmation"
+    },
+    {
+      "description": "Create a new ticket in JIRA for 'Extend search by SKU'",
+      "assignee": "Anna Nagy",
+      "time_elapsed": "pending"
+    },
+    {
+      "description": "Estimate the effort required to implement the new search functionality",
+      "assignee": "Péter Kovács",
+      "time_elapsed": "pending"
+    }
+  ],
+  "emerging_risks_blockers": [
+    {
+      "description": "Potential issue with callback URL handling in Barion's V2 API",
+      "impact": "high",
+      "suggested_action": "Verify the correct method for transactionId return"
+    },
+    {
+      "description": "Potential issue with GDPR compliance due to automatic checking of newsletter subscription during registration",
+      "impact": "medium",
+      "suggested_action": "Review and update newsletter subscription process"
+    },
+    {
+      "description": "Client requirement to extend search functionality may require additional development time",
+      "impact": "high",
+      "suggested_action": "Re-evaluate project timeline and resource allocation"
+    }
+  ]
+}

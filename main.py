@@ -113,8 +113,6 @@ if __name__ == "__main__":
                 logger.trace(f"e-mail n.o {num} | ", model_output)
                 model_outputs.append(model_output)
 
-        print('\n', "##" * 30, '\n')
-
         # For quicker iteration:
         # if i > 2:
         #     break

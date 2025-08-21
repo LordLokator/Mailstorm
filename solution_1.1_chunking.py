@@ -1,8 +1,14 @@
-from data_transformers import get_sanitized_data
-from prompts import prompts
-from config import model, template
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from data_transformers import get_sanitized_data
+from config import model
+
+from prompts import (
+    SINGLE_MAIL_SUMMARY_SYS_PROMPT,
+    SINGLE_MAIL_OUTPUT_FORMAT,
+
+    template
+)
+
 
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=800,
@@ -26,11 +32,10 @@ for email in emails:
     blockers = []
     for chunk in chunks:
 
-
         prompt = template.format(
-            system=prompts['unified']['system_prompt'],
+            system=SINGLE_MAIL_SUMMARY_SYS_PROMPT,
             conversation=conversation,
-            output_format=prompts['unified']['output_format']
+            output_format=SINGLE_MAIL_OUTPUT_FORMAT
         )
         model_output = model.invoke(prompt)
         print(model_output)

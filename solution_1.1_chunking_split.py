@@ -1,5 +1,6 @@
 from data_transformers import get_sanitized_data
-from config import model, system_prompt
+from config import model
+from prompts import SINGLE_MAIL_SUMMARY_SYS_PROMPT
 
 
 emails, colleagues = get_sanitized_data("data/content.zip")
@@ -18,7 +19,7 @@ for email in emails:
     # Collect results across chunks
     blockers = []
     for chunk in chunks:
-        out = model.invoke([system_prompt, chunk])
+        out = model.invoke([SINGLE_MAIL_SUMMARY_SYS_PROMPT, chunk])
         # print(f"\t>> {out}")
         if "Yes" in out:   # crude but works if format is enforced
             blockers.append(out)

@@ -1,6 +1,12 @@
-from prompts import prompts
-from config import model, template
+from config import model
 from data_transformers import get_sanitized_data
+
+from prompts import (
+    SINGLE_MAIL_SUMMARY_SYS_PROMPT,
+    SINGLE_MAIL_OUTPUT_FORMAT,
+
+    template
+)
 
 emails, colleagues = get_sanitized_data("data/content.zip")
 
@@ -13,9 +19,9 @@ for email in emails:
     print(f"Email n.o {num} ({filename}):")
 
     prompt = template.format(
-        system=prompts['unified']['system_prompt'],
+        system=SINGLE_MAIL_SUMMARY_SYS_PROMPT,
         conversation=conversation,
-        output_format=prompts['unified']['output_format']
+        output_format=SINGLE_MAIL_OUTPUT_FORMAT
     )
     model_output = model.invoke(prompt)
     print(model_output)

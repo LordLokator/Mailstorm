@@ -7,7 +7,7 @@
 
 from prompts import prompts
 from config import model, template
-from helpers import get_sanitized_data
+from data_transformers import get_sanitized_data
 
 emails, colleagues = get_sanitized_data("data/content.zip")
 

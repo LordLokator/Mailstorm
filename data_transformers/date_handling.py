@@ -8,7 +8,8 @@ _date_formats = [
 ]
 
 
-def replace_dates_with_deltas(text: str) -> str:
+def replace_dates_with_deltas(text: str, day_zero_name: str = "Start ") -> str:
+
     # regex to capture date substings after "Date: "
     pattern = re.compile(r"^Date:\s*(.+)$", re.MULTILINE)
     lines = pattern.findall(text)
@@ -36,13 +37,13 @@ def replace_dates_with_deltas(text: str) -> str:
         days, secs = delta.days, delta.seconds
         hours, mins = secs // 3600, (secs % 3600) // 60
         if days > 0:
-            return f"+{days}d {hours}h"
+            return f"+ {days}d {hours}h"
         elif hours > 0:
-            return f"+{hours}h {mins}m"
+            return f"+ {hours}h {mins}m"
         else:
-            return f"+{mins}m"
+            return f"+ {mins}m"
 
-    deltas = ["t0"] + [delta_str(d) for d in dates[1:]]
+    deltas = [day_zero_name] + [day_zero_name + delta_str(d) for d in dates[1:]]
 
     # replace sequentially
     out = text
@@ -58,7 +59,5 @@ if __name__ == '__main__':
     path = "data/content.zip"
     emails, _ = get_sanitized_data(path)
 
-    s = emails[0]['conversation']
-    print(s)
-
-    print(replace_dates_with_deltas(s))
+    for mail in emails:
+        replace_dates_with_deltas(mail['conversation'])

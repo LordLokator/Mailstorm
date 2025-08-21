@@ -3,7 +3,7 @@
 # It uses the str.split method,
 # splitting along two new lines (demarcating emails).
 
-from helpers import get_sanitized_data
+from data_transformers import get_sanitized_data
 from config import model, system_prompt
 
 

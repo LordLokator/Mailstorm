@@ -13,35 +13,23 @@ from prompts import (
     template
 )
 
-# Set chunking strategy here!
 
-# Pass whole email conversation as context:
-chunking_strategy = Mode.FULL_CONVERSATION
+def main(mode: Mode):
+    match mode:
+        case Mode.FULL_CONVERSATION:
+            logger.info("Processing full email conversation")
 
-# Use langChain's RecursiveCharacterTextSplitter:
-# chunking_strategy = Mode.AUTO_SPLIT
+        case Mode.AUTO_SPLIT:
+            logger.info("Splitting with RecursiveCharacterTextSplitter")
+            from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# For splitting the convo along emails (split along '\n\n' substring):
-# chunking_strategy = Mode.MANUAL_SPLIT
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1200,
+                chunk_overlap=100,
+            )
 
-match chunking_strategy:
-    case Mode.FULL_CONVERSATION:
-        logger.info("Processing full email conversation")
-
-    case Mode.AUTO_SPLIT:
-        logger.info("Splitting with RecursiveCharacterTextSplitter")
-        from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1200,
-            chunk_overlap=100,
-        )
-
-    case Mode.MANUAL_SPLIT:
-        logger.info("Using manual chunking")
-
-
-def main():
+        case Mode.MANUAL_SPLIT:
+            logger.info("Using manual chunking")
 
     emails, _ = get_sanitized_data("data/content.zip")
 
@@ -53,7 +41,7 @@ def main():
 
         logger.info(f"Analysing e-mail n.o {num} ({filename}).")
 
-        match chunking_strategy:
+        match mode:
             case Mode.FULL_CONVERSATION:
                 prompt = template.format(
                     system=SINGLE_MAIL_SUMMARY_SYS_PROMPT,
@@ -119,7 +107,7 @@ def main():
         # if i > 2:
         #     break
 
-    combined_reports = "\n".join(model_outputs) # bit naive
+    combined_reports = "\n".join(model_outputs)  # bit naive
     final_prompt = template.format(
         system=MASTER_SUMMARIZATION_SYS_PROMPT,
         conversation=combined_reports,  # combine all outputs
@@ -134,4 +122,29 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="LLM powered Portfolio Health Report generator (with chunking strategy).")
+    parser.add_argument(
+        "--chunking_strategy",
+        choices=["manual", "automatic", "none"],
+        default="none",
+        help="Set the chunking strategy (default: none)."
+    )
+
+    args = parser.parse_args()
+    logger.info(f"Selected chunking strategy: {args.chunking_strategy}")
+
+    if args.chunking_strategy == 'manual':
+        # For splitting the convo along emails (split along '\n\n' substring):
+        mode = Mode.MANUAL_SPLIT
+
+    if args.chunking_strategy == 'automatic':
+        # Use langChain's RecursiveCharacterTextSplitter:
+        mode = Mode.AUTO_SPLIT
+
+    if args.chunking_strategy == 'none':
+        # Pass whole email conversation as context:
+        mode = Mode.FULL_CONVERSATION
+
+    main(mode)

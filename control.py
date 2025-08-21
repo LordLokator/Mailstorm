@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class Mode(Enum):
-    FULL_CONVERSATION = "mail"
-    AUTO_SPLIT = "chunk"
-    MANUAL_SPLIT = "split"
+    FULL_CONVERSATION = auto()
+    AUTO_SPLIT = auto()
+    MANUAL_SPLIT = auto()

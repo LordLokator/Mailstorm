@@ -1,6 +1,7 @@
 from config import model
 from data_transformers import get_sanitized_data
 from control import Mode
+from loguru import logger
 from prompts import (
     SINGLE_MAIL_SUMMARY_SYS_PROMPT,
     SINGLE_MAIL_OUTPUT_FORMAT,
@@ -24,10 +25,10 @@ chunking_strategy = Mode.FULL_CONVERSATION
 
 match chunking_strategy:
     case Mode.FULL_CONVERSATION:
-        print("Processing full email conversation")
+        logger.info("Processing full email conversation")
 
     case Mode.AUTO_SPLIT:
-        print("Splitting with RecursiveCharacterTextSplitter")
+        logger.info("Splitting with RecursiveCharacterTextSplitter")
         from langchain_text_splitters import RecursiveCharacterTextSplitter
 
         splitter = RecursiveCharacterTextSplitter(
@@ -36,7 +37,7 @@ match chunking_strategy:
         )
 
     case Mode.MANUAL_SPLIT:
-        print("Using manual chunking")
+        logger.info("Using manual chunking")
 
 
 if __name__ == "__main__":
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         filename = email['filename']
         num = email['num']
 
-        print(f"Email n.o {num} ({filename}):")
+        logger.info(f"Analysing e-mail n.o {num} ({filename}).")
 
         match chunking_strategy:
             case Mode.FULL_CONVERSATION:
@@ -60,11 +61,10 @@ if __name__ == "__main__":
                 )
 
                 model_output = model.invoke(prompt)
+                logger.trace(f"e-mail n.o {num} | ", model_output)
                 model_outputs.append(model_output)
-                print(model_output)
 
             case Mode.AUTO_SPLIT:
-                print("Splitting with RecursiveCharacterTextSplitter")
                 chunks = splitter.split_text(conversation)
 
                 # Collect results across chunks
@@ -81,44 +81,43 @@ if __name__ == "__main__":
                     model_output = model.invoke(prompt)
                     chunk_inference_outputs.append(model_output)
 
+                # Inference / summary over all chunks for a given e-mail:
                 final_prompt = template.format(
                     system=MASTER_SUMMARIZATION_SYS_PROMPT,
                     conversation="\n".join(chunk_inference_outputs),  # combine all outputs
                     output_format=MASTER_SUMMARIZATION_OUTPUT_FORMAT
                 )
 
-                print(final_prompt)
-                summary = model.invoke(final_prompt)
-
-                print(summary)
+                model_output = model.invoke(final_prompt)
+                logger.trace(f"e-mail n.o {num} | ", model_output)
+                model_outputs.append(model_output)
 
             case Mode.MANUAL_SPLIT:
-                print("Using manual chunking")
+                # data / domain specific knowledge:
+                # emails have 2 newlines between them.
                 chunks = conversation.split('\n\n')
 
                 chunk_inference_outputs = []
                 for chunk in chunks:
                     out = model.invoke([SINGLE_MAIL_SUMMARY_SYS_PROMPT, chunk])
-                    # print(f"\t>> {out}")
-                    if "Yes" in out:   # crude but works if format is enforced
-                        chunk_inference_outputs.append(out)
+                    chunk_inference_outputs.append(out)
 
+                # Inference / summary over all parts a given e-mail:
                 final_prompt = template.format(
                     system=MASTER_SUMMARIZATION_SYS_PROMPT,
                     conversation="\n".join(chunk_inference_outputs),  # combine all outputs
                     output_format=MASTER_SUMMARIZATION_OUTPUT_FORMAT
                 )
 
-                print(final_prompt)
-                summary = model.invoke(final_prompt)
-
-                print(summary)
+                model_output = model.invoke(final_prompt)
+                logger.trace(f"e-mail n.o {num} | ", model_output)
+                model_outputs.append(model_output)
 
         print('\n', "##" * 30, '\n')
 
         # For quicker iteration:
-        if i > 2:
-            break
+        # if i > 2:
+        #     break
 
     final_prompt = template.format(
         system=MASTER_SUMMARIZATION_SYS_PROMPT,
@@ -126,7 +125,7 @@ if __name__ == "__main__":
         output_format=MASTER_SUMMARIZATION_OUTPUT_FORMAT
     )
 
-    print(final_prompt)
+    logger.info(final_prompt)
     summary = model.invoke(final_prompt)
 
-    print(summary)
+    logger.info(summary)

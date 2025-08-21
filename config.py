@@ -23,4 +23,4 @@ model = OllamaLLM(
 
 async def invoke_async(llm, prompt):
     result = await llm.ainvoke(prompt)
-    print(result)
+    return result

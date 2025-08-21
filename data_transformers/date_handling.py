@@ -51,13 +51,3 @@ def replace_dates_with_deltas(text: str, day_zero_name: str = "Start ") -> str:
         out = out.replace(f"Date: {orig}", f"Date: {rep}", 1)
 
     return out
-
-
-if __name__ == '__main__':
-
-    from data_transformers import get_sanitized_data
-    path = "data/content.zip"
-    emails, _ = get_sanitized_data(path)
-
-    for mail in emails:
-        replace_dates_with_deltas(mail['conversation'])
